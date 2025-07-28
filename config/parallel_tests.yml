@@ -1,0 +1,18 @@
+# Parallel Tests configuration
+# This file is used by the parallel_tests gem to configure parallel testing
+
+# Number of parallel processes to use
+# You can also set this via PARALLEL_TEST_PROCESSORS environment variable
+parallel_processes: <%= ENV.fetch('PARALLEL_TEST_PROCESSORS', 4) %>
+
+# Database configuration for parallel tests
+databases:
+  test:
+    database: rails_app_test<%= ENV['TEST_ENV_NUMBER'] %>
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    username: <%= ENV.fetch('DATABASE_USERNAME', 'postgres') %>
+    password: <%= ENV.fetch('DATABASE_PASSWORD', 'postgres') %>
+    host: <%= ENV.fetch('DATABASE_HOST', 'localhost') %>
+    port: <%= ENV.fetch('DATABASE_PORT', 5432) %>

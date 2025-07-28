@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# RSpec Test Runner
+# This script runs different types of tests with proper configuration
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}🚀 Rails RSpec Test Runner${NC}"
+
+# Function to run specific test suite
+run_tests() {
+    local test_type=$1
+    local path=$2
+    
+    echo -e "${YELLOW}📦 Running $test_type tests...${NC}"
+    
+    if [ "$test_type" = "all" ]; then
+        bundle exec rspec --format progress
+    else
+        bundle exec rspec $path --format progress
+    fi
+    
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✅ $test_type tests passed!${NC}"
+    else
+        echo -e "${RED}❌ $test_type tests failed!${NC}"
+        exit 1
+    fi
+}
+
+# Parse command line arguments
+case "${1:-all}" in
+    "models")
+        run_tests "Model" "spec/models"
+        ;;
+    "controllers")
+        run_tests "Controller" "spec/controllers"
+        ;;
+    "requests")
+        run_tests "Request" "spec/requests"
+        ;;
+    "parallel")
+        echo -e "${YELLOW}⚡ Running parallel tests...${NC}"
+        bundle exec parallel_rspec spec/ --combine-stderr --serialize-stdout
+        ;;
+    "coverage")
+        echo -e "${YELLOW}📊 Running tests with coverage...${NC}"
+        COVERAGE=true bundle exec rspec --format progress
+        ;;
+    "all")
+        run_tests "All" ""
+        ;;
+    *)
+        echo "Usage: $0 [models|controllers|requests|parallel|coverage|all]"
+        echo ""
+        echo "Examples:"
+        echo "  $0 models     # Run only model tests"
+        echo "  $0 requests   # Run only request tests"
+        echo "  $0 parallel   # Run tests in parallel"
+        echo "  $0 coverage   # Run with coverage report"
+        echo "  $0 all        # Run all tests (default)"
+        exit 1
+        ;;
+esac
+
+echo -e "${GREEN}🎉 Test run completed successfully!${NC}"

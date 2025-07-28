@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# RSpec Setup Script
+# Run this script after installing the gems to set up RSpec
+
+set -e
+
+echo "🚀 Setting up RSpec for Rails..."
+
+# Install RSpec if not already done
+if [ ! -f "spec/rails_helper.rb" ]; then
+    echo "📦 Installing RSpec..."
+    bundle exec rails generate rspec:install
+fi
+
+# Create test databases
+echo "🗄️ Setting up test database..."
+RAILS_ENV=test bundle exec rails db:create db:schema:load
+
+# Setup parallel test databases
+echo "⚡ Setting up parallel test databases..."
+bundle exec parallel_test -e "RAILS_ENV=test bundle exec rails db:create db:schema:load" --type rspec
+
+echo "✅ RSpec setup completed!"
+echo ""
+echo "Available commands:"
+echo "  bundle exec rspec                    # Run all tests"
+echo "  bundle exec rspec spec/models        # Run model tests"
+echo "  bundle exec rspec spec/controllers   # Run controller tests"  
+echo "  bundle exec rspec spec/system        # Run system tests"
+echo "  bin/parallel_rspec                   # Run tests in parallel"
+echo "  bundle exec parallel_rspec spec/     # Run parallel tests"

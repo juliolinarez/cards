@@ -1,0 +1,104 @@
+# GitLab CI/CD for Rails - Complete & Corrected Version
+
+# Usa una imagen de Ruby estable.
+image: ruby:3.3
+
+# Variables globales para todos los jobs.
+# Nota: No se define DATABASE_URL para permitir que parallel_test funcione correctamente.
+variables:
+  POSTGRES_HOST: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: ""
+  POSTGRES_HOST_AUTH_METHOD: trust
+  RAILS_ENV: test
+  BUNDLE_PATH: "vendor/bundle"
+
+# El caché acelera el job 'install' en ejecuciones subsiguientes.
+cache:
+  key:
+    files:
+      - Gemfile.lock
+  paths:
+    - vendor/bundle/
+
+stages:
+  - install_dependencies # Etapa 1: Instalar todo
+  - test                 # Etapa 2: Probar y analizar
+  - report               # Etapa 3: Reportar
+
+# --- STAGE 1: INSTALL DEPENDENCIES ---
+install:
+  stage: install_dependencies
+  script:
+    - apt-get update -qq && apt-get install -y -qq nodejs postgresql-client libpq-dev
+    - gem install bundler --no-document
+    - bundle config set --local path "${BUNDLE_PATH}"
+    - bundle install --jobs $(nproc)
+  # Guarda las gemas instaladas como un artefacto para los siguientes stages.
+  artifacts:
+    paths:
+      - vendor/bundle/
+    expire_in: 1 hour
+
+# --- STAGE 2: TEST ---
+# Los jobs en este stage dependen de 'install' y usan sus artefactos.
+
+test:
+  stage: test
+  services:
+    - name: postgres:15-alpine
+      alias: postgres
+  needs:
+    - job: install
+      artifacts: true
+  parallel: 2
+  script:
+    - bundle exec rails db:create
+    - bundle exec rails db:migrate
+    - echo "Ejecutando tests en job ${CI_NODE_INDEX} de ${CI_NODE_TOTAL}..."
+    - bundle exec parallel_test -n ${CI_NODE_TOTAL} --type rspec --only-group ${CI_NODE_INDEX} spec/
+
+  coverage: '/\(\d+.\d+\%\) covered/'
+  artifacts:
+    paths:
+      - coverage/
+      - tmp/rspec.xml # Asumiendo que RSpec ahora guarda un solo archivo combinado.
+    reports:
+      junit: tmp/rspec.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
+    expire_in: 1 week
+    when: always
+
+
+rubocop:
+  stage: test
+  needs:
+    - job: install
+      artifacts: true
+  script:
+    - bundle exec rubocop --format progress --format json --out rubocop-report.json
+  artifacts:
+    reports:
+      codequality: rubocop-report.json
+    expire_in: 1 week
+
+# --- STAGE 3: REPORT ---
+coverage:
+  stage: report
+  needs:
+    - job: test
+      artifacts: true
+  script:
+    - echo "Consolidated coverage artifacts are ready."
+    - echo "The 'coverage/' directory is available from the previous stage."
+  artifacts:
+    paths:
+      - coverage/
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
+    expire_in: 2 weeks
+    expose_as: "Coverage Report"
