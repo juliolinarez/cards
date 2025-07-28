@@ -1,5 +1,8 @@
 FROM ruby:3.4.5-bookworm
 
+# Install Node.js 22.x (Latest LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+
 # Instala dependencias del sistema necesarias para build y test
 RUN apt-get update -qq && \
     apt-get install -y build-essential libpq-dev nodejs netcat-openbsd postgresql-client --no-install-recommends && \
