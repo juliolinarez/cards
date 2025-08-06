@@ -27,8 +27,8 @@ SimpleCov.start 'rails' do
     SimpleCov::Formatter::CoberturaFormatter
   ])
 
-  # Set minimum coverage threshold (reasonable for small project)
-  minimum_coverage 60
+  # Set minimum coverage threshold (high quality standard)
+  minimum_coverage 70
 end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
