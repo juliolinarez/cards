@@ -1,7 +1,7 @@
 module HomeHelper
   def user_greeting
     if user_signed_in?
-      first_name = current_user.email.split('@').first.split('.').first.capitalize
+      first_name = current_user.email.split("@").first.split(".").first.capitalize
       "Welcome back, #{first_name}!"
     else
       "Welcome to Proxyfield!"
