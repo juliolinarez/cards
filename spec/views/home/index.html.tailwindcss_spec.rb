@@ -29,8 +29,8 @@ RSpec.describe "home/index.html.erb", type: :view do
 
   it "shows feature highlights" do
     expect(rendered).to include("Why Choose Proxyfield?")
-    expect(rendered).to include("Fast Search")
-    expect(rendered).to include("Modern Interface")
+    expect(rendered).to include("Powerful Search")
+    expect(rendered).to include("Intuitive Deck Builder")
     expect(rendered).to include("Community Driven")
   end
 
@@ -45,8 +45,8 @@ RSpec.describe "home/index.html.erb", type: :view do
     end
 
     it "shows sign up and sign in links" do
-      expect(rendered).to include("Get Started")
-      expect(rendered).to include("Already have an account?")
+      expect(rendered).to include("Sign Up - It&#39;s Free!")
+      expect(rendered).to include("Learn More")
     end
   end
 
