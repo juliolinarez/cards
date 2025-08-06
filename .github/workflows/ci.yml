@@ -54,7 +54,7 @@ jobs:
         bundle exec rails db:create db:migrate
 
     - name: Run tests
-      run: bundle exec rspec --format documentation
+      run: bundle exec rspec --format documentation --color
 
     - name: Run security audit
       run: bundle exec brakeman --exit-on-warn --no-progress --format plain

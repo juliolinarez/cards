@@ -1,4 +1,4 @@
-.PHONY: up down build bash attach logs build-css install test test-docs db-create db-migrate db-reset
+.PHONY: up down build bash attach logs build-css install test test-docs test-fast db-create db-migrate db-reset
 
 # Development environment
 up:
@@ -37,9 +37,12 @@ db-migrate:
 db-reset:
 	docker compose run --rm app bash -c "bundle exec rails db:drop db:create db:migrate"
 
-# Test commands
+# Test commands with beautiful colors
 test:
-	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec $(filter-out $@,$(MAKECMDGOALS))"
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --color $(filter-out $@,$(MAKECMDGOALS))"
 
 test-docs:
-	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation $(filter-out $@,$(MAKECMDGOALS))"
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation --color $(filter-out $@,$(MAKECMDGOALS))"
+
+test-fast:
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format progress --color $(filter-out $@,$(MAKECMDGOALS))"
