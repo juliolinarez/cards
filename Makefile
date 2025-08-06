@@ -1,6 +1,6 @@
-.PHONY: up down build bash attach logs build-css install up-test down-test up-prod down-prod test test-docs test-isolated test-setup
+.PHONY: up down build bash attach logs build-css install test test-docs db-create db-migrate db-reset
 
-# Development environment (default)
+# Development environment
 up:
 	docker compose up
 
@@ -19,33 +19,13 @@ attach:
 logs:
 	docker compose logs -f app
 
-# Test environment
-up-test:
-	docker compose -f docker-compose.test.yml up
-
-down-test:
-	docker compose -f docker-compose.test.yml down
-
-bash-test:
-	docker compose -f docker-compose.test.yml run --rm app_test bash
-
-# Production environment
-up-prod:
-	docker compose -f docker-compose.production.yml up
-
-down-prod:
-	docker compose -f docker-compose.production.yml down
-
-bash-prod:
-	docker compose -f docker-compose.production.yml run --rm app_prod bash
+# Install/update dependencies (Ruby and Node.js)
+install:
+	docker compose run --rm app bash -c "bundle install && npm install"
 
 # Build CSS with DaisyUI
 build-css:
 	docker compose run --rm app npm run build:css
-
-# Install/update dependencies (Ruby and Node.js)
-install:
-	docker compose run --rm app bash -c "bundle install && npm install"
 
 # Database commands
 db-create:
@@ -63,9 +43,3 @@ test:
 
 test-docs:
 	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation"
-
-test-isolated:
-	docker compose -f docker-compose.test.yml run --rm app_test bash -c "bundle exec rspec"
-
-test-setup:
-	docker compose -f docker-compose.test.yml run --rm app_test bash -c "bundle exec rails db:create db:migrate"
