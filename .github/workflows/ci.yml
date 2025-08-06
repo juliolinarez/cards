@@ -67,11 +67,21 @@ jobs:
             covered_lines = 0
 
             coverage_data['RSpec']['coverage'].each do |file, lines|
-              lines.each do |line_coverage|
-                if line_coverage != nil
-                  total_lines += 1
-                  covered_lines += 1 if line_coverage > 0
+              lines.each_with_index do |line_coverage, index|
+                next if line_coverage.nil?
+
+                # Handle both integer and array formats
+                coverage_count = case line_coverage
+                when Integer
+                  line_coverage
+                when Array
+                  line_coverage.is_a?(Array) ? line_coverage.sum : 0
+                else
+                  0
                 end
+
+                total_lines += 1
+                covered_lines += 1 if coverage_count > 0
               end
             end
 
