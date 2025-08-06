@@ -43,7 +43,3 @@ test:
 
 test-docs:
 	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation $(filter-out $@,$(MAKECMDGOALS))"
-
-# Ignore additional arguments as targets
-%:
-	@:
