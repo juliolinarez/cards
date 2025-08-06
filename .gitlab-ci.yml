@@ -23,8 +23,9 @@ cache:
 
 stages:
   - install_dependencies # Etapa 1: Instalar todo
-  - test                 # Etapa 2: Probar y analizar
-  - report               # Etapa 3: Reportar
+  - test                 # Etapa 2: Probar
+  - quality              # Etapa 3: Análisis de calidad
+  - coverage             # Etapa 4: Cobertura de código
 
 # --- STAGE 1: INSTALL DEPENDENCIES ---
 install:
@@ -57,23 +58,17 @@ test:
     - bundle exec rails db:migrate
     - echo "Ejecutando tests en job ${CI_NODE_INDEX} de ${CI_NODE_TOTAL}..."
     - bundle exec parallel_test -n ${CI_NODE_TOTAL} --type rspec --only-group ${CI_NODE_INDEX} spec/
-
-  coverage: '/\(\d+.\d+\%\) covered/'
   artifacts:
     paths:
-      - coverage/
       - tmp/rspec.xml # Asumiendo que RSpec ahora guarda un solo archivo combinado.
     reports:
       junit: tmp/rspec.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage/coverage.xml
     expire_in: 1 week
     when: always
 
 
 rubocop:
-  stage: test
+  stage: quality
   needs:
     - job: install
       artifacts: true
@@ -84,15 +79,41 @@ rubocop:
       codequality: rubocop-report.json
     expire_in: 1 week
 
-# --- STAGE 3: REPORT ---
+# --- STAGE 4: COVERAGE ---
 coverage:
-  stage: report
+  stage: coverage
+  services:
+    - name: postgres:15-alpine
+      alias: postgres
   needs:
-    - job: test
+    - job: install
       artifacts: true
   script:
-    - echo "Consolidated coverage artifacts are ready."
-    - echo "The 'coverage/' directory is available from the previous stage."
+    - bundle exec rails db:create
+    - bundle exec rails db:migrate
+    - bundle exec rspec
+    - ruby -e "
+      require 'json'
+      if File.exist?('coverage/.resultset.json')
+        coverage_data = JSON.parse(File.read('coverage/.resultset.json'))
+        if coverage_data && coverage_data['RSpec']
+          covered = coverage_data['RSpec']['coverage'].values.flatten.count { |x| x && x > 0 }
+          total = coverage_data['RSpec']['coverage'].values.flatten.count { |x| x != nil }
+          percentage = (covered.to_f / total * 100).round(2)
+          puts \"Coverage: #{percentage}%\"
+          if percentage < 70
+            puts \"ERROR: Coverage #{percentage}% is below minimum requirement of 70%\"
+            exit 1
+          else
+            puts \"SUCCESS: Coverage #{percentage}% meets requirement\"
+          end
+        end
+      else
+        puts 'No coverage data found'
+        exit 1
+      end
+      "
+  coverage: '/\(\d+.\d+\%\) covered/'
   artifacts:
     paths:
       - coverage/

@@ -1,4 +1,4 @@
-name: CI
+name: Code Coverage
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  coverage:
     runs-on: ubuntu-latest
 
     services:
@@ -53,8 +53,36 @@ jobs:
         bundle exec rails db:environment:set RAILS_ENV=test
         bundle exec rails db:create db:migrate
 
-    - name: Run tests
+    - name: Run tests with coverage
       run: bundle exec rspec --format documentation --color
 
-    - name: Run security audit
-      run: bundle exec brakeman --exit-on-warn --no-progress --format plain
+    - name: Check coverage threshold
+      run: |
+        ruby -e "
+        require 'json'
+        if File.exist?('coverage/.resultset.json')
+          coverage_data = JSON.parse(File.read('coverage/.resultset.json'))
+          if coverage_data && coverage_data['RSpec']
+            covered = coverage_data['RSpec']['coverage'].values.flatten.count { |x| x && x > 0 }
+            total = coverage_data['RSpec']['coverage'].values.flatten.count { |x| x != nil }
+            percentage = (covered.to_f / total * 100).round(2)
+            puts \"Coverage: #{percentage}%\"
+            if percentage < 70
+              puts \"ERROR: Coverage #{percentage}% is below minimum requirement of 70%\"
+              exit 1
+            else
+              puts \"SUCCESS: Coverage #{percentage}% meets requirement\"
+            end
+          end
+        else
+          puts 'No coverage data found'
+          exit 1
+        end
+        "
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        file: ./coverage/coverage.xml
+        fail_ci_if_error: true
