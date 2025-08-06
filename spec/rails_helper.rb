@@ -1,20 +1,12 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
-require_relative '../config/environment'
-# Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
-
-# SimpleCov for test coverage
+# SimpleCov MUST be started before loading application code
 require 'simplecov'
 require 'simplecov-cobertura'
 
-# Configure SimpleCov for parallel testing
 SimpleCov.start 'rails' do
   # Enable coverage collection
   enable_coverage :branch if respond_to?(:enable_coverage)
 
-  # Filters
+  # Filters (exclude these from coverage)
   add_filter '/spec/'
   add_filter '/config/'
   add_filter '/vendor/'
@@ -22,29 +14,29 @@ SimpleCov.start 'rails' do
   add_filter '/db/'
   add_filter '/lib/tasks/'
 
-  # Groups for better organization
+  # Groups for better organization in HTML report
   add_group 'Controllers', 'app/controllers'
   add_group 'Models', 'app/models'
   add_group 'Helpers', 'app/helpers'
   add_group 'Jobs', 'app/jobs'
   add_group 'Mailers', 'app/mailers'
 
-  # Configure formatters based on environment
-  if ENV['CI_NODE_INDEX']
-    command_name "#{SimpleCov.command_name}-#{ENV['CI_NODE_INDEX']}"
-  end
-
+  # Configure formatters for both local and CI
   formatter SimpleCov::Formatter::MultiFormatter.new([
     SimpleCov::Formatter::HTMLFormatter,
     SimpleCov::Formatter::CoberturaFormatter
   ])
 
-
   # Set minimum coverage threshold (reasonable for small project)
   minimum_coverage 60
-  # Disable per-file coverage for small project with minimal files
-  # minimum_coverage_by_file 40
 end
+
+# This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'spec_helper'
+ENV['RAILS_ENV'] ||= 'test'
+require_relative '../config/environment'
+# Prevent database truncation if the environment is production
+abort("The Rails environment is running in production mode!") if Rails.env.production?
 
 require 'rspec/rails'
 
