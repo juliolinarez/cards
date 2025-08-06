@@ -80,9 +80,29 @@ jobs:
         end
         "
 
-    - name: Upload coverage reports
+    - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       if: always()
       with:
         file: ./coverage/coverage.xml
-        fail_ci_if_error: true
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+      continue-on-error: true
+
+    - name: Coverage upload status
+      if: always()
+      run: |
+        if [ -f ./coverage/coverage.xml ]; then
+          echo "✅ Coverage report generated successfully"
+          echo "📊 Coverage data is available in coverage/ directory"
+          if [ -z "${{ secrets.CODECOV_TOKEN }}" ]; then
+            echo "⚠️  CODECOV_TOKEN not set - upload skipped"
+            echo "To enable Codecov uploads:"
+            echo "1. Sign up at https://codecov.io"
+            echo "2. Add your repository"
+            echo "3. Copy the token to GitHub Secrets as CODECOV_TOKEN"
+          fi
+        else
+          echo "❌ Coverage report not found"
+          exit 1
+        fi
