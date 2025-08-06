@@ -39,7 +39,11 @@ db-reset:
 
 # Test commands
 test:
-	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec"
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec $(filter-out $@,$(MAKECMDGOALS))"
 
 test-docs:
-	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation"
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation $(filter-out $@,$(MAKECMDGOALS))"
+
+# Ignore additional arguments as targets
+%:
+	@:
