@@ -1,4 +1,4 @@
-.PHONY: up down build bash attach logs build-css install up-test down-test up-prod down-prod
+.PHONY: up down build bash attach logs build-css install up-test down-test up-prod down-prod test test-docs test-isolated test-setup
 
 # Development environment (default)
 up:
@@ -56,3 +56,16 @@ db-migrate:
 
 db-reset:
 	docker compose run --rm app bash -c "bundle exec rails db:drop db:create db:migrate"
+
+# Test commands
+test:
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec"
+
+test-docs:
+	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format documentation"
+
+test-isolated:
+	docker compose -f docker-compose.test.yml run --rm app_test bash -c "bundle exec rspec"
+
+test-setup:
+	docker compose -f docker-compose.test.yml run --rm app_test bash -c "bundle exec rails db:create db:migrate"
