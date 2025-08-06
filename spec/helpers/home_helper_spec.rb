@@ -4,7 +4,7 @@ RSpec.describe HomeHelper, type: :helper do
   describe "#user_greeting" do
     context "when user is signed in" do
       let(:user) { create(:user, email: "john.doe@example.com") }
-      
+
       before do
         allow(helper).to receive(:user_signed_in?).and_return(true)
         allow(helper).to receive(:current_user).and_return(user)
@@ -37,7 +37,7 @@ RSpec.describe HomeHelper, type: :helper do
 
     it "generates a feature card with proper styling" do
       result = helper.feature_card(title, description)
-      
+
       expect(result).to include("bg-white bg-opacity-10 backdrop-blur-lg rounded-xl")
       expect(result).to include("Fast Search")
       expect(result).to include("Find cards quickly with our advanced search")
@@ -45,7 +45,7 @@ RSpec.describe HomeHelper, type: :helper do
 
     it "includes proper CSS classes for styling" do
       result = helper.feature_card(title, description)
-      
+
       expect(result).to include("text-xl font-semibold text-white mb-2")
       expect(result).to include("text-purple-200 text-sm")
       expect(result).to include("w-12 h-12 bg-purple-500 rounded-lg")
@@ -53,7 +53,7 @@ RSpec.describe HomeHelper, type: :helper do
 
     it "accepts custom icon class parameter" do
       result = helper.feature_card(title, description, "custom-icon")
-      
+
       expect(result).to be_present
       expect(result).to include(title)
       expect(result).to include(description)
