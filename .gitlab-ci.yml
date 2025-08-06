@@ -76,9 +76,10 @@ test:
                 when Integer
                   line_coverage
                 when Array
-                  line_coverage.is_a?(Array) ? line_coverage.sum : 0
+                  # Convert array elements to integers and sum them
+                  line_coverage.map { |x| x.to_i }.sum
                 else
-                  0
+                  line_coverage.to_i
                 end
 
                 total_lines += 1
