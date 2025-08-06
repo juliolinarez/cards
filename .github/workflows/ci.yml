@@ -56,5 +56,74 @@ jobs:
     - name: Run tests
       run: bundle exec rspec --format documentation --color
 
+    - name: Check coverage threshold
+      run: |
+        ruby -e "
+        require 'json'
+        if File.exist?('coverage/.resultset.json')
+          coverage_data = JSON.parse(File.read('coverage/.resultset.json'))
+          if coverage_data && coverage_data['RSpec'] && coverage_data['RSpec']['coverage']
+            total_lines = 0
+            covered_lines = 0
+
+            coverage_data['RSpec']['coverage'].each do |file, lines|
+              lines.each do |line_coverage|
+                if line_coverage != nil
+                  total_lines += 1
+                  covered_lines += 1 if line_coverage > 0
+                end
+              end
+            end
+
+            if total_lines > 0
+              percentage = (covered_lines.to_f / total_lines * 100).round(2)
+              puts \"Coverage: #{percentage}% (#{covered_lines}/#{total_lines} lines)\"
+              if percentage < 70
+                puts \"ERROR: Coverage #{percentage}% is below minimum requirement of 70%\"
+                exit 1
+              else
+                puts \"SUCCESS: Coverage #{percentage}% meets requirement\"
+              end
+            else
+              puts 'No coverage data lines found'
+              exit 1
+            end
+          else
+            puts 'Invalid coverage data structure'
+            exit 1
+          end
+        else
+          puts 'No coverage data found'
+          exit 1
+        end
+        "
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        file: ./coverage/coverage.xml
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+      continue-on-error: true
+
+    - name: Coverage upload status
+      if: always()
+      run: |
+        if [ -f ./coverage/coverage.xml ]; then
+          echo "✅ Coverage report generated successfully"
+          echo "📊 Coverage data is available in coverage/ directory"
+          if [ -z "${{ secrets.CODECOV_TOKEN }}" ]; then
+            echo "⚠️  CODECOV_TOKEN not set - upload skipped"
+            echo "To enable Codecov uploads:"
+            echo "1. Sign up at https://codecov.io"
+            echo "2. Add your repository"
+            echo "3. Copy the token to GitHub Secrets as CODECOV_TOKEN"
+          fi
+        else
+          echo "❌ Coverage report not found"
+          exit 1
+        fi
+
     - name: Run security audit
       run: bundle exec brakeman --exit-on-warn --no-progress --format plain
