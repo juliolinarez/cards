@@ -67,23 +67,22 @@ test:
             total_lines = 0
             covered_lines = 0
 
-            coverage_data['RSpec']['coverage'].each do |file, lines|
-              lines.each_with_index do |line_coverage, index|
-                next if line_coverage.nil?
+            coverage_data['RSpec']['coverage'].each do |file, file_data|
+              # SimpleCov stores data as arrays: ['lines', [coverage_data]] and ['branches', {branch_data}]
+              file_data.each do |data_type_array|
+                next unless data_type_array.is_a?(Array) && data_type_array.length == 2
 
-                # Handle both integer and array formats
-                coverage_count = case line_coverage
-                when Integer
-                  line_coverage
-                when Array
-                  # Convert array elements to integers and sum them
-                  line_coverage.map { |x| x.to_i }.sum
-                else
-                  line_coverage.to_i
+                data_type, data = data_type_array
+                next unless data_type == 'lines' && data.is_a?(Array)
+
+                # Process line coverage data
+                data.each do |line_coverage|
+                  next if line_coverage.nil?
+
+                  coverage_count = line_coverage.to_i
+                  total_lines += 1
+                  covered_lines += 1 if coverage_count > 0
                 end
-
-                total_lines += 1
-                covered_lines += 1 if coverage_count > 0
               end
             end
 
