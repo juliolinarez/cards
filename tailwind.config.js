@@ -4,7 +4,9 @@ module.exports = {
     "./app/views/**/*.html.erb",
     "./app/helpers/**/*.rb",
     "./app/assets/stylesheets/**/*.css",
-    "./app/javascript/**/*.js"
+    "./frontend/**/*.js",
+    "./frontend/**/*.ts",
+    "./frontend/**/*.vue"
   ],
   theme: {
     extend: {},

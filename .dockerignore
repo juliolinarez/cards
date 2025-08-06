@@ -7,7 +7,6 @@
 # Ignore bundler config.
 /.bundle
 
-
 # Ignore all environment files.
 /.env*
 
@@ -33,9 +32,8 @@
 
 # Ignore assets.
 /node_modules/
-/app/assets/builds/*
-!/app/assets/builds/.keep
-/public/assets
+/public/vite*
+!/pnpm-lock.yaml
 
 # Ignore CI service files.
 /.github

@@ -1,4 +1,4 @@
-.PHONY: up down build bash attach logs build-css install
+.PHONY: up down build bash attach logs build-css install dev
 
 up:
 	docker compose up
@@ -18,9 +18,17 @@ attach:
 logs:
 	docker compose logs -f app
 
-# Build CSS with DaisyUI
+# Start Vite dev server for HMR
+dev:
+	docker compose run --rm -p 3036:3036 app npm run dev -- --host 0.0.0.0
+
+# Build CSS with Vite and Tailwind
 build-css:
-	docker compose run --rm app npm run build:css
+	docker compose run --rm app npm run build
+
+# Build CSS in watch mode for development
+build-css-watch:
+	docker compose run --rm app npm run dev
 
 # Install/update dependencies (Ruby and Node.js)
 install:

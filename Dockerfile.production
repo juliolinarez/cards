@@ -1,72 +1,88 @@
-# syntax=docker/dockerfile:1
-# check=error=true
+FROM ruby:3.4.5-bookworm AS builder
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t app_example .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name app_example app_example
+# Establece variables de entorno para producción
+ENV RAILS_ENV=production \
+    NODE_ENV=production \
+    BUNDLE_PATH="/app/.bundle_cache" \
+    BUNDLE_WITHOUT="development test"
 
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
+# Instala Node.js 22.x (LTS) y dependencias de build
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+      build-essential \
+      libpq-dev \
+      nodejs \
+      git
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.4.5
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+WORKDIR /app
 
-# Rails app lives here
-WORKDIR /rails
-
-# Install base packages
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
-# Throw-away build stage to reduce size of final image
-FROM base AS build
-
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Install application gems
+# Instala dependencias de Ruby (aprovechando el caché de Docker)
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    bundle exec bootsnap precompile --gemfile
+RUN bundle install --jobs $(nproc) --retry 3 && \
+    rm -rf /app/.bundle_cache/ruby/*/cache/*.gem && \
+    find /app/.bundle_cache/ruby/*/gems/ -name "*.c" -delete && \
+    find /app/.bundle_cache/ruby/*/gems/ -name "*.o" -delete
 
-# Copy application code
+# Instala dependencias de Javascript (si usas package.json)
+# Descomenta las siguientes líneas si tienes un package.json
+# COPY package.json package-lock.json ./
+# RUN npm install
+
+# Copia el resto del código de la aplicación
 COPY . .
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+# Precompila los assets.
+# SECRET_KEY_BASE_DUMMY es necesario para que el comando no falle si usas credenciales.
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# ===================================================================
+# Stage 2: Production
+# Esta es la imagen final, ligera y optimizada.
+# ===================================================================
+FROM ruby:3.4.5-slim-bookworm AS production
 
+# Establece variables de entorno para producción
+ENV RAILS_ENV=production \
+    NODE_ENV=production
 
+# Instala solo las dependencias de RUNTIME necesarias
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+      postgresql-client \
+      libpq5 \
+      netcat-openbsd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Crea un usuario no-root para correr la aplicación
+RUN useradd --create-home --shell /bin/bash rails
 
-# Final stage for app image
-FROM base
+WORKDIR /app
 
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
-COPY --from=build /rails /rails
+# Copia los artefactos desde la etapa 'builder'
+COPY --from=builder --chown=rails:rails /app/.bundle_cache /app/.bundle_cache
+COPY --from=builder --chown=rails:rails /app/public /app/public
+COPY --from=builder --chown=rails:rails /app/config /app/config
+COPY --from=builder --chown=rails:rails /app/app /app/app
+COPY --from=builder --chown=rails:rails /app/lib /app/lib
+COPY --from=builder --chown=rails:rails /app/db/migrate /app/db/migrate
+COPY --from=builder --chown=rails:rails /app/bin /app/bin
+COPY --from=builder --chown=rails:rails /app/Rakefile /app/Rakefile
+COPY --from=builder --chown=rails:rails /app/Gemfile /app/Gemfile
+COPY --from=builder --chown=rails:rails /app/Gemfile.lock /app/Gemfile.lock
 
-# Run and own only the runtime files as a non-root user for security
-RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER 1000:1000
+# Copia el entrypoint y dale permisos
+COPY --chown=rails:rails entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
 
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+# Cambia al usuario no-root
+USER rails
 
-# Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+# Expone el puerto de la aplicación
+EXPOSE 3000
+
+# Define el entrypoint
+ENTRYPOINT ["entrypoint.sh"]
+
+# El comando por defecto para iniciar el servidor de Rails
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
