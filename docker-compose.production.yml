@@ -1,0 +1,29 @@
+services:
+  db_prod:
+    image: postgres:14
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_for_production}
+      POSTGRES_DB: proxyfield_production
+
+  app_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    volumes:
+      - .:/app
+    ports:
+      - "3002:3000"
+    depends_on:
+      - db_prod
+    environment:
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD:-secure_password_for_production}@db_prod:5432/proxyfield_production"
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+
+volumes:
+  postgres_prod_data:

@@ -1,0 +1,26 @@
+services:
+  db_test:
+    image: postgres:14
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: proxyfield_test
+
+  app_test:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db_test
+    environment:
+      DATABASE_URL: "postgresql://postgres:password@db_test:5432/proxyfield_test"
+      RAILS_ENV: test
+
+volumes:
+  postgres_test_data:
