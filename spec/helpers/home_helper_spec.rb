@@ -51,8 +51,8 @@ RSpec.describe HomeHelper, type: :helper do
       expect(result).to include("w-12 h-12 bg-purple-500 rounded-lg")
     end
 
-    it "accepts custom icon class parameter" do
-      result = helper.feature_card(title, description, "custom-icon")
+    it "handles title and description parameters correctly" do
+      result = helper.feature_card(title, description)
 
       expect(result).to be_present
       expect(result).to include(title)

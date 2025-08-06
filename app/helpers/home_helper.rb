@@ -8,7 +8,7 @@ module HomeHelper
     end
   end
 
-  def feature_card(title, description, icon_class = "heroicon-solid-star")
+  def feature_card(title, description)
     content_tag(:div, class: "bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-6 border border-white border-opacity-20") do
       concat(content_tag(:div, "", class: "w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4"))
       concat(content_tag(:h3, title, class: "text-xl font-semibold text-white mb-2"))

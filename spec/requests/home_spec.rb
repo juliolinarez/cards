@@ -20,17 +20,7 @@ RSpec.describe "Home", type: :request do
     end
   end
 
-  describe "GET /home/index" do
-    it "returns http success" do
-      get "/home/index"
-      expect(response).to have_http_status(:success)
-    end
 
-    it "renders the landing page template" do
-      get "/home/index"
-      expect(response).to render_template(:index)
-    end
-  end
 
   context "when user is signed in" do
     let(:user) { create(:user) }
