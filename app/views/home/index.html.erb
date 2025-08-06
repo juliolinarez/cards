@@ -1,0 +1,135 @@
+<% content_for(:title, "Proxyfield - A modern deck builder for Magic: The Gathering®") %>
+
+<!-- Hero Section with Background -->
+<div class="relative min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-blue-900">
+  <!-- Background overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+
+  <!-- Hero Content -->
+  <div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
+    <div class="max-w-4xl mx-auto">
+      <!-- Main Logo and Title -->
+      <div class="mb-8">
+        <div class="mx-auto w-24 h-24 bg-gradient-to-r from-purple-400 to-blue-400 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+          <span class="text-white font-bold text-4xl">P</span>
+        </div>
+        <h1 class="text-6xl md:text-7xl font-bold text-white mb-4 tracking-tight">
+          PROXYFIELD
+        </h1>
+        <p class="text-xl md:text-2xl text-purple-200 mb-12 font-light">
+          A modern deck builder for Magic: The Gathering®
+        </p>
+      </div>
+
+      <!-- Search Section -->
+      <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 mb-12 shadow-2xl border border-white border-opacity-20">
+        <div class="mb-6">
+          <div class="flex flex-wrap justify-center gap-2 mb-6">
+            <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
+              Decks
+            </button>
+            <button class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
+              Cards
+            </button>
+            <button class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
+              Brewers
+            </button>
+            <button class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
+              Advanced →
+            </button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative max-w-2xl mx-auto">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input type="text" placeholder="Search decks"
+                   class="block w-full pl-12 pr-4 py-4 text-lg border-0 rounded-xl bg-white bg-opacity-90 backdrop-blur-sm placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-all">
+          </div>
+        </div>
+
+        <!-- Featured Deck (placeholder) -->
+        <div class="bg-purple-600 bg-opacity-20 rounded-xl p-4 max-w-md mx-auto">
+          <div class="flex items-center space-x-2 text-purple-200 text-sm mb-2">
+            <span class="bg-purple-500 text-white px-2 py-1 rounded text-xs font-medium">NEW</span>
+            <span>Featured Deck</span>
+          </div>
+          <h3 class="text-white font-semibold">Explore deck building possibilities</h3>
+        </div>
+      </div>
+
+      <!-- Call to Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <% if user_signed_in? %>
+          <%= link_to "Start Building", "#cards",
+                class: "bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 shadow-lg" %>
+          <%= link_to "Browse Decks", "#decks",
+                class: "bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 border border-white border-opacity-30" %>
+        <% else %>
+          <%= link_to "Sign Up - It's Free!", new_user_registration_path,
+                class: "bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 shadow-lg" %>
+          <%= link_to "Learn More", "#features",
+                class: "bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 border border-white border-opacity-30" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center">
+      <p class="text-sm text-purple-200 mb-2">EXPLORE MORE</p>
+      <svg class="w-6 h-6 mx-auto animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<section id="features" class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose Proxyfield?</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Build, test, and share your Magic: The Gathering decks with our modern, intuitive platform.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Feature 1 -->
+      <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Intuitive Deck Builder</h3>
+        <p class="text-gray-600">Create and organize your decks with our easy-to-use interface designed for modern deck building.</p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Powerful Search</h3>
+        <p class="text-gray-600">Find exactly the cards you need with advanced search and filtering capabilities.</p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Community Driven</h3>
+        <p class="text-gray-600">Share your creations and discover amazing decks from brewers around the world.</p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -2,13 +2,18 @@ services:
   db:
     image: postgres:14
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: rails_app_development
+      POSTGRES_DB: proxyfield_development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
@@ -18,9 +23,10 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      DATABASE_URL: "postgresql://postgres:password@db:5432/rails_app_development"
+      DATABASE_URL: "postgresql://postgres:password@db:5432/proxyfield_development"
       RAILS_ENV: development
 
 volumes:
