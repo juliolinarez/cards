@@ -15,11 +15,19 @@ This is a Rails 8.0 application called "Proxyfield" - a modern deck builder for 
 - `make bash` - Open bash shell in container
 - `make install` - Install Ruby and Node.js dependencies
 
+### Database Management
+- `make db-create` - Create databases
+- `make db-migrate` - Run database migrations
+- `make db-reset` - Drop, create, and migrate databases
+
 ### Testing
 - `bundle exec rspec` - Run all tests
 - `bundle exec rspec spec/models/user_spec.rb` - Run specific test file
 - `bundle exec rspec spec/models/user_spec.rb:10` - Run specific test line
 - `bundle exec parallel_rspec spec/` - Run tests in parallel
+- `make test` - Run tests via Docker with color output
+- `make test-docs` - Run tests with documentation format
+- `make test-fast` - Run tests with progress format
 
 ### Code Quality
 - `bundle exec rubocop` - Run Ruby linter
@@ -46,14 +54,16 @@ This is a Rails 8.0 application called "Proxyfield" - a modern deck builder for 
 
 ### Testing Architecture
 - **Framework**: RSpec with Rails integration
-- **Test Data**: FactoryBot for fixtures
-- **Coverage**: SimpleCov with 80% minimum coverage requirement
+- **Test Data**: FactoryBot for fixtures and Faker for realistic data
+- **Coverage**: SimpleCov with 70% minimum coverage requirement (enforced in CI)
 - **Matchers**: Shoulda matchers for model validations
 - **Parallel Testing**: Configured via parallel_tests gem
+- **System Testing**: Capybara with Selenium WebDriver
 
 ### Database
-- PostgreSQL in development (via Docker)
-- Database URL: `postgresql://postgres:password@db:5433/proxyfield_development`
+- PostgreSQL 14 in development (via Docker on port 5433)
+- Development URL: `postgresql://postgres:password@db:5432/proxyfield_development`
+- Test URL: `postgresql://postgres:password@localhost:5432/proxyfield_test`
 
 ## Docker Configuration
 
@@ -69,3 +79,21 @@ The application runs in Docker with:
 - `spec/rails_helper.rb` - Test setup with SimpleCov coverage reporting
 - `Makefile` - Docker development commands
 - `docker-compose.yml` - Container orchestration
+
+## CI/CD Pipeline
+
+The application includes GitHub Actions workflows:
+
+### Test Pipeline (`.github/workflows/ci.yml`)
+- Runs on Ruby 3.4.5 and Node.js 22
+- Uses PostgreSQL 14 service container
+- Executes full RSpec test suite with documentation format
+- Enforces 70% minimum test coverage requirement
+- Runs Brakeman security analysis
+- Uploads coverage reports to Codecov (if token configured)
+
+### Code Quality Pipeline (`.github/workflows/rubocop.yml`)
+- Runs RuboCop linting with Rails Omakase rules
+- Enforces consistent Ruby code style
+
+Both pipelines run on pushes to main branch and pull requests targeting main.
