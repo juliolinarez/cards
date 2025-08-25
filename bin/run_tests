@@ -13,19 +13,31 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}🚀 Rails RSpec Test Runner${NC}"
 
+# Check if running in Docker or local
+USE_DOCKER=${USE_DOCKER:-true}
+
 # Function to run specific test suite
 run_tests() {
     local test_type=$1
     local path=$2
-    
+
     echo -e "${YELLOW}📦 Running $test_type tests...${NC}"
-    
-    if [ "$test_type" = "all" ]; then
-        bundle exec rspec --format progress
+
+    if [ "$USE_DOCKER" = "true" ]; then
+        echo -e "${YELLOW}🐳 Running tests in Docker container...${NC}"
+        if [ "$test_type" = "all" ]; then
+            docker-compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format progress"
+        else
+            docker-compose exec app bash -c "RAILS_ENV=test bundle exec rspec $path --format progress"
+        fi
     else
-        bundle exec rspec $path --format progress
+        if [ "$test_type" = "all" ]; then
+            bundle exec rspec --format progress
+        else
+            bundle exec rspec $path --format progress
+        fi
     fi
-    
+
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ $test_type tests passed!${NC}"
     else
@@ -47,11 +59,19 @@ case "${1:-all}" in
         ;;
     "parallel")
         echo -e "${YELLOW}⚡ Running parallel tests...${NC}"
-        bundle exec parallel_rspec spec/ --combine-stderr --serialize-stdout
+        if [ "$USE_DOCKER" = "true" ]; then
+            docker-compose exec app bash -c "RAILS_ENV=test bundle exec parallel_rspec spec/ --combine-stderr --serialize-stdout"
+        else
+            bundle exec parallel_rspec spec/ --combine-stderr --serialize-stdout
+        fi
         ;;
     "coverage")
         echo -e "${YELLOW}📊 Running tests with coverage...${NC}"
-        COVERAGE=true bundle exec rspec --format progress
+        if [ "$USE_DOCKER" = "true" ]; then
+            docker-compose exec app bash -c "RAILS_ENV=test COVERAGE=true bundle exec rspec --format progress"
+        else
+            COVERAGE=true bundle exec rspec --format progress
+        fi
         ;;
     "all")
         run_tests "All" ""

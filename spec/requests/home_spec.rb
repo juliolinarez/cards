@@ -25,11 +25,9 @@ RSpec.describe "Home", type: :request do
   context "when user is signed in" do
     let(:user) { create(:user) }
 
-    before do
-      sign_in user
-    end
-
     it "still shows the landing page" do
+      # Use Warden's login_as for request specs
+      login_as(user, scope: :user)
       get root_path
       expect(response).to have_http_status(:success)
       expect(response.body).to include("PROXYFIELD")
