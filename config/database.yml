@@ -34,15 +34,6 @@ production:
     username: <%= ENV.fetch("POSTGRES_USER") { 'postgres' } unless ENV['DATABASE_URL'] %>
     password: <%= ENV.fetch("POSTGRES_PASSWORD") { 'password' } unless ENV['DATABASE_URL'] %>
     migrations_paths: db/cache_migrate
-  queue:
-    <<: *default
-    database: proxyfield_production_queue
-    # Fly.io PostgreSQL configuration for queue
-    url: <%= ENV['QUEUE_DATABASE_URL'] || ENV['DATABASE_URL'] %>
-    host: <%= ENV.fetch("POSTGRES_HOST") { 'localhost' } unless ENV['DATABASE_URL'] %>
-    username: <%= ENV.fetch("POSTGRES_USER") { 'postgres' } unless ENV['DATABASE_URL'] %>
-    password: <%= ENV.fetch("POSTGRES_PASSWORD") { 'password' } unless ENV['DATABASE_URL'] %>
-    migrations_paths: db/queue_migrate
   cable:
     <<: *default
     database: proxyfield_production_cable

@@ -34,6 +34,9 @@ Rails.application.configure do
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
+  # Use Sidekiq for Active Job
+  config.active_job.queue_adapter = :sidekiq
+
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
 

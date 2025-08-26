@@ -9,6 +9,24 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_for_production}
       POSTGRES_DB: proxyfield_production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis_prod:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_prod_data:/data
+    command: redis-server --appendonly yes --appendfsync everysec
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app_prod:
     build:
@@ -19,11 +37,34 @@ services:
     ports:
       - "3002:3000"
     depends_on:
-      - db_prod
+      db_prod:
+        condition: service_healthy
+      redis_prod:
+        condition: service_healthy
     environment:
       DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD:-secure_password_for_production}@db_prod:5432/proxyfield_production"
+      REDIS_URL: "redis://redis_prod:6379/0"
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+
+  sidekiq_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    volumes:
+      - .:/app
+    depends_on:
+      db_prod:
+        condition: service_healthy
+      redis_prod:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD:-secure_password_for_production}@db_prod:5432/proxyfield_production"
+      REDIS_URL: "redis://redis_prod:6379/0"
       RAILS_ENV: production
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
 
 volumes:
   postgres_prod_data:
+  redis_prod_data:
