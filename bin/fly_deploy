@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Fly.io deployment script for Rails app
+
+set -e
+
+echo "🚀 Deploying Rails app to Fly.io..."
+
+# Check if fly CLI is installed
+if ! command -v fly &> /dev/null; then
+    echo "❌ Fly CLI is not installed. Please install it first:"
+    echo "   curl -L https://fly.io/install.sh | sh"
+    exit 1
+fi
+
+# Check if fly.toml exists
+if [ ! -f "fly.toml" ]; then
+    echo "❌ fly.toml not found. Please make sure you're in the correct directory."
+    exit 1
+fi
+
+# Build and deploy
+echo "📦 Building and deploying..."
+fly deploy --dockerfile Dockerfile.fly
+
+echo "✅ Deployment complete!"
+echo "🌐 Your app should be available at: https://$(fly info --app $(grep '^app' fly.toml | cut -d' ' -f3 | tr -d "'\"")).fly.dev"

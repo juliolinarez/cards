@@ -1,0 +1,74 @@
+# Fly.io optimized Dockerfile for Rails 8 with PostgreSQL and Tailwind CSS
+
+FROM ruby:3.4.5-bookworm AS base
+
+# Install Node.js 22.x (Latest LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+
+# Install system dependencies
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    postgresql-client \
+    curl \
+    git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set up Rails app directory
+WORKDIR /rails
+
+# Install Rails and update RubyGems
+RUN gem update --system --no-document && \
+    gem install bundler --no-document
+
+# Build stage - includes all dependencies for asset compilation
+FROM base AS build
+
+# Copy Gemfile and install ALL Ruby dependencies (including dev/test for asset compilation)
+COPY Gemfile Gemfile.lock ./
+RUN bundle config set --local deployment true && \
+    bundle install --jobs $(nproc) --retry 3
+
+# Copy package.json and install ALL Node.js dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy application code
+COPY . .
+
+# Build Tailwind CSS with npm (this is all we need for styling)
+RUN npm run build:css
+
+# Production stage - clean environment with only production dependencies  
+FROM base AS production
+
+# Copy Gemfile and install only production Ruby dependencies
+COPY Gemfile Gemfile.lock ./
+RUN bundle config set --local deployment true && \
+    bundle config set --local without development:test && \
+    bundle install --jobs $(nproc) --retry 3
+
+# Copy application code
+COPY . .
+
+# Copy built CSS from build stage (only the CSS we actually built)
+COPY --from=build /rails/app/assets/builds/ /rails/app/assets/builds/
+
+# Create entrypoint script (while still root)
+COPY entrypoint.sh /rails/
+RUN chmod +x /rails/entrypoint.sh
+
+# Create non-root user and set ownership
+RUN useradd rails --create-home --shell /bin/bash && \
+    chown -R rails:rails /rails
+USER rails:rails
+
+# Expose port 3000
+EXPOSE 3000
+
+ENTRYPOINT ["/rails/entrypoint.sh"]
+
+# Start the Rails server
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]

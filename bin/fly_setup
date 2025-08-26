@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# Fly.io setup script for Rails app
+
+set -e
+
+echo "🛠️  Setting up Fly.io for your Rails app..."
+
+# Check if fly CLI is installed
+if ! command -v fly &> /dev/null; then
+    echo "❌ Fly CLI is not installed. Installing now..."
+    curl -L https://fly.io/install.sh | sh
+    echo "🔄 Please restart your terminal or run: source ~/.bashrc (or ~/.zshrc)"
+    echo "🔄 Then run this script again."
+    exit 1
+fi
+
+# Check if user is logged in
+if ! fly auth whoami &> /dev/null; then
+    echo "🔐 Please log in to Fly.io:"
+    fly auth login
+fi
+
+# Get the app name from fly.toml or ask user
+if [ -f "fly.toml" ]; then
+    APP_NAME=$(grep '^app' fly.toml | cut -d' ' -f3 | tr -d "'\"")
+    echo "📝 Found app name in fly.toml: $APP_NAME"
+else
+    echo "❌ fly.toml not found. Please make sure the Fly.io configuration is set up."
+    exit 1
+fi
+
+# Create the app if it doesn't exist
+if ! fly apps list | grep -q "$APP_NAME"; then
+    echo "🆕 Creating Fly.io app: $APP_NAME"
+    fly apps create $APP_NAME --org personal
+fi
+
+# Create PostgreSQL database
+echo "🗄️  Setting up PostgreSQL database..."
+if ! fly postgres list | grep -q "$APP_NAME-db"; then
+    echo "🆕 Creating PostgreSQL database: $APP_NAME-db"
+    fly postgres create --name "$APP_NAME-db" --region ord --vm-size shared-cpu-1x --volume-size 1
+    
+    echo "🔗 Attaching database to app..."
+    fly postgres attach "$APP_NAME-db" --app "$APP_NAME"
+else
+    echo "✅ Database $APP_NAME-db already exists"
+fi
+
+# Set environment variables
+echo "🔧 Setting up environment variables..."
+fly secrets set \
+  RAILS_ENV=production \
+  RAILS_SERVE_STATIC_FILES=true \
+  RAILS_LOG_TO_STDOUT=true \
+  SECRET_KEY_BASE=$(openssl rand -hex 64) \
+  --app "$APP_NAME"
+
+echo "✅ Fly.io setup complete!"
+echo ""
+echo "📋 Next steps:"
+echo "   1. Review your fly.toml configuration"
+echo "   2. Run: bin/fly_deploy to deploy your app"
+echo "   3. Run: fly open to view your deployed app"
+echo ""
+echo "🔍 Useful commands:"
+echo "   - fly logs: View application logs"
+echo "   - fly ssh console: SSH into your app"
+echo "   - fly status: Check app status"
