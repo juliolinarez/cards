@@ -97,6 +97,18 @@ RSpec.configure do |config|
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::ControllerHelpers, type: :view
   config.include Devise::Test::IntegrationHelpers, type: :request
+  config.include Devise::Test::IntegrationHelpers, type: :feature
+
+  # Include Warden test helpers for request specs
+  config.include Warden::Test::Helpers
+
+  # Include route helpers
+  config.include Rails.application.routes.url_helpers
+
+  # Reset Warden after each test
+  config.after :each do
+    Warden.test_reset!
+  end
 
   # Include Rails controller testing helpers
   config.include Rails::Controller::Testing::TestProcess, type: :controller
