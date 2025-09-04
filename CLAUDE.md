@@ -39,6 +39,12 @@ This is a Rails 8.0 application called "Proxyfield" - a modern deck builder for 
 - `npm run build:css:watch` - Build Tailwind CSS with file watching
 - `make build-css` - Build CSS via Docker
 
+### Background Jobs (Sidekiq)
+- `bundle exec sidekiq` - Start Sidekiq worker (development)
+- `bundle exec sidekiq -C config/sidekiq.yml` - Start with custom config
+- `docker compose up sidekiq` - Start Sidekiq via Docker
+- `docker compose logs -f sidekiq` - View Sidekiq worker logs
+
 ## Architecture
 
 ### Core Models
@@ -65,20 +71,32 @@ This is a Rails 8.0 application called "Proxyfield" - a modern deck builder for 
 - Development URL: `postgresql://postgres:password@db:5432/proxyfield_development`
 - Test URL: `postgresql://postgres:password@localhost:5432/proxyfield_test`
 
+### Background Jobs & Caching
+- **Queue System**: Sidekiq with Redis for background job processing
+- **Redis**: Version 7 Alpine (via Docker on port 6379)
+- **Queue Priorities**: Critical (6), Default (4), Mailers (3), Low (2)
+- **Configuration**: Environment-specific concurrency and retry settings
+- **Web UI**: Available at `/sidekiq` (requires user authentication)
+- **Logging**: Dedicated Sidekiq logs in `log/sidekiq.log`
+
 ## Docker Configuration
 
 The application runs in Docker with:
 - Ruby 3.4.5 base image
 - Node.js 22.x for frontend assets
-- PostgreSQL 14 database container
+- PostgreSQL 14 database container (port 5433)
+- Redis 7 Alpine for Sidekiq (port 6379)
+- Sidekiq worker container for background jobs
 - Volume mounting for live code updates
+- Health checks for database and Redis connectivity
 
 ## Key Configuration Files
 
 - `tailwind.config.js` - TailwindCSS + DaisyUI theming configuration
 - `spec/rails_helper.rb` - Test setup with SimpleCov coverage reporting
 - `Makefile` - Docker development commands
-- `docker-compose.yml` - Container orchestration
+- `docker-compose.yml` - Container orchestration with app, db, redis, sidekiq services
+- `config/sidekiq.yml` - Sidekiq worker configuration with queue priorities
 
 ## CI/CD Pipeline
 

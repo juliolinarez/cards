@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 
-require_relative "../config/environment"
-require "solid_queue/cli"
+# This script starts the Sidekiq worker process
+# Usage: bin/jobs
 
-SolidQueue::Cli.start(ARGV)
+require "pathname"
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile",
+  Pathname.new(__FILE__).realpath)
+
+require "rubygems"
+require "bundler/setup"
+
+# Start Sidekiq
+exec "bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"
