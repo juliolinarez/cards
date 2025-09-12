@@ -66,11 +66,10 @@ RUN groupadd --system --gid 1000 rails && \
     mkdir -p coverage && \
     chown -R rails:rails db log storage tmp coverage spec
 
-# Copiar configuración de bash para historial persistente
-COPY .bashrc /home/rails/.bashrc
-COPY .bash_profile /home/rails/.bash_profile
-RUN chown rails:rails /home/rails/.bashrc /home/rails/.bash_profile && \
-    chmod 644 /home/rails/.bashrc /home/rails/.bash_profile
+# Dar permisos de escritura al usuario rails en el directorio de bundler
+# Esto permite ejecutar bundle install dentro del contenedor
+RUN chown -R rails:rails "${BUNDLE_PATH}" && \
+    chmod -R u+w "${BUNDLE_PATH}"
 
 USER 1000:1000
 

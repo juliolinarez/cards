@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
@@ -24,6 +26,9 @@ gem "jbuilder"
 
 # Devise for authentication
 gem "devise"
+
+# ViewComponent for component-based views
+gem "view_component"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

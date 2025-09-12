@@ -1,0 +1,6 @@
+<%= turbo_stream.update "message-display" do %>
+  <%= render MessageComponent.new(message: message, alert_class: alert_class) %>
+<% end %>
+<%= turbo_stream.update "counter-display" do %>
+  <%= render CounterComponent.new(counter: counter) %>
+<% end %>

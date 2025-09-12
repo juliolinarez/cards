@@ -6,3 +6,141 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
+
+# Avoid unused variables
+Lint/UnusedBlockArgument:
+  Enabled: true
+
+Lint/UnusedMethodArgument:
+  Enabled: true
+
+# Method length limits
+Metrics/MethodLength:
+  Enabled: true
+  Max: 20
+
+# Force 2-space indentation
+Layout/IndentationWidth:
+  Enabled: true
+  Width: 2
+
+Layout/IndentationConsistency:
+  Enabled: true
+  EnforcedStyle: indented_internal_methods
+
+# Require blank line after early returns
+Layout/EmptyLineAfterGuardClause:
+  Enabled: true
+
+# Community recommended rules for Rails projects
+
+# String literals
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# Prefer symbols over strings for hash keys
+Style/HashSyntax:
+  Enabled: true
+  EnforcedStyle: ruby19
+
+# Class and module length
+Metrics/ClassLength:
+  Enabled: true
+  Max: 150
+
+Metrics/ModuleLength:
+  Enabled: true
+  Max: 150
+
+# Line length
+Layout/LineLength:
+  Enabled: true
+  Max: 120
+  Exclude:
+    - 'config/routes.rb'
+    - 'db/migrate/*'
+
+# Block length for RSpec and routes
+Metrics/BlockLength:
+  Enabled: true
+  Max: 25
+  Exclude:
+    - 'spec/**/*'
+    - 'config/routes.rb'
+    - 'config/environments/*'
+
+# Documentation requirements
+Style/Documentation:
+  Enabled: false
+
+# Prefer each over for
+Style/For:
+  Enabled: true
+  EnforcedStyle: each
+
+# Trailing commas
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+# Method naming
+Naming/MethodName:
+  Enabled: true
+  EnforcedStyle: snake_case
+
+# Variable naming
+Naming/VariableName:
+  Enabled: true
+  EnforcedStyle: snake_case
+
+# Constant naming
+Naming/ConstantName:
+  Enabled: true
+
+# File naming
+Naming/FileName:
+  Enabled: true
+  Exclude:
+    - 'Gemfile'
+    - 'Rakefile'
+
+# Security
+Security/YAMLLoad:
+  Enabled: true
+
+# Performance
+Performance/RedundantMerge:
+  Enabled: true
+
+Performance/StringReplacement:
+  Enabled: true
+
+# Rails specific
+Rails/HasManyOrHasOneDependent:
+  Enabled: true
+
+Rails/InverseOf:
+  Enabled: true
+
+Rails/Presence:
+  Enabled: true
+
+Rails/Present:
+  Enabled: true
+
+Rails/Blank:
+  Enabled: true
+
+# Allow longer argument lines for view helpers with classes
+Layout/ArgumentAlignment:
+  Enabled: false
+
+# Allow breaking long method calls with arguments
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented_relative_to_receiver

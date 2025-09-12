@@ -6,7 +6,7 @@ Sidekiq.configure_server do |config|
   config.redis = {
     url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
     network_timeout: 5,
-    pool_timeout: 5
+    pool_timeout: 5,
   }
 
   # Server middleware
@@ -20,7 +20,7 @@ Sidekiq.configure_server do |config|
   end
 
   # Error handling
-  config.error_handlers << proc do |exception, context_hash|
+  config.error_handlers << proc do |exception, _context_hash|
     # Log errors to Rails logger
     Rails.logger.error "Sidekiq error: #{exception.message}"
     Rails.logger.error exception.backtrace.join("\n") if exception.backtrace
@@ -38,7 +38,7 @@ Sidekiq.configure_client do |config|
     url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
     network_timeout: 5,
     pool_timeout: 5,
-    size: 1
+    size: 1,
   }
 
   # Client middleware

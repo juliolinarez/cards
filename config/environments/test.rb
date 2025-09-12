@@ -48,6 +48,9 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
+  # Raise an error on lazy loading of associations.
+  config.active_record.strict_loading_by_default = true
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
