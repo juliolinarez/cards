@@ -49,5 +49,5 @@ test-fast:
 
 # Start the Fly.io app machine and SSH into it
 fly-ssh:
-	fly machines start 784e22df340158 --app proxyfield-app
-	fly ssh console --app proxyfield-app --machine 784e22df340158
+	fly machines list --app proxyfield-app --json | jq -r '.[0].id' | xargs -I{} fly machines start {} --app proxyfield-app
+	fly machines list --app proxyfield-app --json | jq -r '.[0].id' | xargs -I{} fly ssh console --app proxyfield-app --machine {}
