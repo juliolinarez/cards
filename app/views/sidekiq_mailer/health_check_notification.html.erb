@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sidekiq Health Check</title>
+  </head>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+      <h1 style="margin: 0; font-size: 24px;">✅ Sidekiq Health Check</h1>
+      <p style="margin: 10px 0 0 0; opacity: 0.9;">Sistema de trabajos en segundo plano funcionando correctamente</p>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+      <h2 style="margin: 0 0 15px 0; color: #495057;">📊 Estadísticas de Sidekiq</h2>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #28a745;">
+          <div style="font-size: 24px; font-weight: bold; color: #28a745;"><%= @sidekiq_stats.processed %></div>
+          <div style="color: #6c757d; font-size: 14px;">Trabajos procesados</div>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #17a2b8;">
+          <div style="font-size: 24px; font-weight: bold; color: #17a2b8;"><%= @sidekiq_stats.enqueued %></div>
+          <div style="color: #6c757d; font-size: 14px;">Trabajos pendientes</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #fd7e14;">
+          <div style="font-size: 24px; font-weight: bold; color: #fd7e14;"><%= @sidekiq_stats.failed %></div>
+          <div style="color: #6c757d; font-size: 14px;">Trabajos fallidos</div>
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #6f42c1;">
+          <div style="font-size: 24px; font-weight: bold; color: #6f42c1;"><%= @sidekiq_stats.queues.count %></div>
+          <div style="color: #6c757d; font-size: 14px;">Colas activas</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #e9ecef; padding: 15px; border-radius: 8px; font-size: 14px; color: #495057;">
+      <p style="margin: 0 0 10px 0;"><strong>🕐 Hora:</strong> <%= @timestamp.in_time_zone('America/Santiago').strftime('%d/%m/%Y %H:%M:%S %Z') %></p>
+      <p style="margin: 0 0 10px 0;"><strong>🖥️ Servidor:</strong> <%= @hostname %></p>
+      <p style="margin: 0;"><strong>🚀 Aplicación:</strong> Proxyfield (Magic: The Gathering Deck Builder)</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+      <p style="margin: 0; color: #6c757d; font-size: 12px;">
+        Este es un mensaje automático del sistema de monitoreo de Sidekiq
+      </p>
+    </div>
+  </body>
+</html>

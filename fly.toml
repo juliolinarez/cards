@@ -18,6 +18,10 @@ org = 'cards'
   RAILS_LOG_TO_STDOUT = 'true'
   RAILS_SERVE_STATIC_FILES = 'true'
   PORT = '3000'
+  # Email configuration (Brevo SMTP)
+  SMTP_ADDRESS = 'smtp-relay.brevo.com'
+  SMTP_PORT = '587'
+  SMTP_DOMAIN = 'proxyfield.com'
 
 [http_service]
   internal_port = 3000
@@ -27,7 +31,24 @@ org = 'cards'
   min_machines_running = 0
   processes = ['app']
 
+[processes]
+  app = './bin/rails server'
+  sidekiq = 'bundle exec sidekiq -C config/sidekiq.yml'
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+  processes = ['app']
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+  processes = ['sidekiq']
+
+[sidekiq_service]
+  processes = ['sidekiq']
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
