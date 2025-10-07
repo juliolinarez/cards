@@ -1,4 +1,4 @@
-.PHONY: up down build bash attach logs build-css install test test-docs test-fast db-create db-migrate db-reset
+.PHONY: up down build bash attach logs build-css install test test-docs test-fast db-create db-migrate db-reset fly-ssh
 
 # Development environment
 up:
@@ -46,3 +46,8 @@ test-docs:
 
 test-fast:
 	docker compose exec app bash -c "RAILS_ENV=test bundle exec rspec --format progress --color $(filter-out $@,$(MAKECMDGOALS))"
+
+# Start the Fly.io app machine and SSH into it
+fly-ssh:
+	fly machines list --app proxyfield-app --json | jq -r '.[0].id' | xargs -I{} fly machines start {} --app proxyfield-app
+	fly machines list --app proxyfield-app --json | jq -r '.[0].id' | xargs -I{} fly ssh console --app proxyfield-app --machine {}
