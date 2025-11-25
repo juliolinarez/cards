@@ -11,7 +11,7 @@ WORKDIR /rails
 
 # Instalar paquetes base necesarios en la imagen final
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips libpq5 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Configurar entorno de producción
@@ -63,7 +63,15 @@ COPY --from=build /rails /rails
 # Crear y usar un usuario no-root por seguridad
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    mkdir -p coverage && \
+    chown -R rails:rails db log storage tmp coverage spec
+
+# Copiar configuración de bash para historial persistente
+COPY .bashrc /home/rails/.bashrc
+COPY .bash_profile /home/rails/.bash_profile
+RUN chown rails:rails /home/rails/.bashrc /home/rails/.bash_profile && \
+    chmod 644 /home/rails/.bashrc /home/rails/.bash_profile
+
 USER 1000:1000
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

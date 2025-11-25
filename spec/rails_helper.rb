@@ -114,6 +114,11 @@ RSpec.configure do |config|
   config.include Rails::Controller::Testing::TestProcess, type: :controller
   config.include Rails::Controller::Testing::TemplateAssertions, type: :controller
   config.include Rails::Controller::Testing::Integration, type: :controller
+
+  # Configure default host for request specs to avoid host authorization errors
+  config.before(:each, type: :request) do
+    host! 'localhost'
+  end
 end
 
 # Shoulda Matchers configuration

@@ -29,9 +29,11 @@ services:
 
   app:
     build: .
+    stdin_open: true
+    tty: true 
     # command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - .:/app
+      - .:/rails
     ports:
       - "3000:3000"
     depends_on:
@@ -46,9 +48,11 @@ services:
 
   sidekiq:
     build: .
+    stdin_open: true
+    tty: true 
     command: bundle exec sidekiq -C config/sidekiq.yml
     volumes:
-      - .:/app
+      - .:/rails
     depends_on:
       db:
         condition: service_healthy
