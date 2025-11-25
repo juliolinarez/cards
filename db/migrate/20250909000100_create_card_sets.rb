@@ -20,5 +20,3 @@ class CreateCardSets < ActiveRecord::Migration[8.0]
     add_index :card_sets, :released_at
   end
 end
-
-

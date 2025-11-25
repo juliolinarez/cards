@@ -4,5 +4,3 @@ class EnablePgExtensions < ActiveRecord::Migration[8.0]
     enable_extension "citext" unless extension_enabled?("citext")
   end
 end
-
-

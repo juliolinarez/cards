@@ -55,12 +55,10 @@ class CreateCardPrintings < ActiveRecord::Migration[8.0]
     add_index :card_printings, :scryfall_id, unique: true
     add_index :card_printings, :oracle_id
     add_index :card_printings, :released_at
-    add_index :card_printings, [:card_set_id, :collector_number]
+    add_index :card_printings, [ :card_set_id, :collector_number ]
     add_index :card_printings, :name, using: :gin, opclass: :gin_trgm_ops
     add_index :card_printings, :colors, using: :gin
     add_index :card_printings, :color_identity, using: :gin
     add_index :card_printings, :legalities, using: :gin
   end
 end
-
-
