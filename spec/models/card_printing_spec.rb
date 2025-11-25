@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CardPrinting, type: :model do
-  subject { build(:card_printing, card_set: build(:card_set)) }
+  subject { build(:card_printing) }
 
   it { should belong_to(:card_set) }
   it { should have_many(:card_faces).dependent(:destroy) }
@@ -13,8 +13,8 @@ RSpec.describe CardPrinting, type: :model do
 
   describe 'scopes' do
     # Example: by_name returns printing by substring matching
-    let!(:printing1) { create(:card_printing, name: 'Fireball', card_set: create(:card_set)) }
-    let!(:printing2) { create(:card_printing, name: 'Lightning Bolt', card_set: printing1.card_set) }
+    let!(:printing1) { create(:card_printing, name: 'Fireball') }
+    let!(:printing2) { create(:card_printing, name: 'Lightning Bolt') }
 
     it 'by_name returns relevant records' do
       expect(described_class.by_name('Fire')).to include(printing1)
