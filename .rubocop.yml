@@ -1,6 +1,12 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  Exclude:
+    - 'db/schema.rb'
+
 Lint/UnusedBlockArgument:
   Enabled: true
 
@@ -137,5 +143,6 @@ Layout/ArgumentAlignment:
 Layout/MultilineMethodCallIndentation:
   Enabled: true
   EnforcedStyle: indented_relative_to_receiver
+
 Layout/SpaceInsideArrayLiteralBrackets:
   EnforcedStyle: no_space
