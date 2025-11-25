@@ -23,7 +23,7 @@ class CreateCardFaces < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :card_faces, [ :card_printing_id, :index ], unique: true
+    add_index :card_faces, [:card_printing_id, :index], unique: true
     add_index :card_faces, :name, using: :gin, opclass: :gin_trgm_ops
     add_index :card_faces, :colors, using: :gin
   end

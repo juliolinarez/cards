@@ -62,7 +62,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_000300) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["card_printing_id", "index"], name: "index_card_faces_on_card_printing_id_and_index", unique: true
-    t.index ["card_printing_id"], name: "index_card_faces_on_card_printing_id"
     t.index ["colors"], name: "index_card_faces_on_colors", using: :gin
     t.index ["name"], name: "index_card_faces_on_name", opclass: :gin_trgm_ops, using: :gin
   end
@@ -109,7 +108,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_000300) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["card_set_id", "collector_number"], name: "index_card_printings_on_card_set_id_and_collector_number"
-    t.index ["card_set_id"], name: "index_card_printings_on_card_set_id"
     t.index ["color_identity"], name: "index_card_printings_on_color_identity", using: :gin
     t.index ["colors"], name: "index_card_printings_on_colors", using: :gin
     t.index ["legalities"], name: "index_card_printings_on_legalities", using: :gin
