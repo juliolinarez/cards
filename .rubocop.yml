@@ -146,3 +146,6 @@ Layout/MultilineMethodCallIndentation:
 
 Layout/SpaceInsideArrayLiteralBrackets:
   EnforcedStyle: no_space
+
+Layout/AccessModifierIndentation:
+  EnforcedStyle: outdent
