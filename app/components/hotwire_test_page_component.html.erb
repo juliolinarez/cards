@@ -1,0 +1,66 @@
+<div class="container mx-auto p-8">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h1 class="card-title text-3xl font-bold text-center mb-8">
+        🚀 Prueba de Hotwire & AJAX con ViewComponents
+      </h1>
+      
+      <div class="text-center mb-8">
+        <div id="message-display">
+          <%= render MessageComponent.new(message: message, alert_class: "alert-info") %>
+        </div>
+      </div>
+
+      <div class="text-center mb-6">
+        <div id="counter-display">
+          <%= render CounterComponent.new(counter: counter) %>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+        <%= button_to "Botón 1", hotwire_test_button_one_path, 
+            method: :post,
+            class: "btn btn-primary btn-lg w-full sm:w-auto",
+            data: { turbo_method: :post } %>
+        
+        <%= button_to "Botón 2", hotwire_test_button_two_path, 
+            method: :post,
+            class: "btn btn-secondary btn-lg w-full sm:w-auto",
+            data: { turbo_method: :post } %>
+        
+        <%= button_to "Botón 3", hotwire_test_button_three_path, 
+            method: :post,
+            class: "btn btn-accent btn-lg w-full sm:w-auto",
+            data: { turbo_method: :post } %>
+      </div>
+
+      <div class="text-center">
+        <%= button_to "🔄 Reiniciar Contador", hotwire_test_reset_path, 
+            method: :post,
+            class: "btn btn-outline btn-warning",
+            data: { turbo_method: :post } %>
+      </div>
+
+      <div class="mt-8">
+        <div class="collapse collapse-plus bg-base-200">
+          <input type="checkbox" />
+          <div class="collapse-title text-xl font-medium">
+            ℹ️ ¿Cómo funciona esto con ViewComponents?
+          </div>
+          <div class="collapse-content">
+            <div class="prose">
+              <p>Esta demo utiliza <strong>ViewComponents + Hotwire Turbo Streams</strong>:</p>
+              <ul>
+                <li>🧩 <strong>ViewComponents</strong>: Componentes reutilizables y testables</li>
+                <li>🎯 <strong>Turbo Streams</strong>: Actualiza solo elementos específicos</li>
+                <li>⚡ <strong>Sin JavaScript personalizado</strong>: Todo funciona con HTML</li>
+                <li>🚀 <strong>Respuesta rápida</strong>: Solo se envía el contenido que cambia</li>
+                <li>🧪 <strong>Fácil testing</strong>: Cada componente se puede testear independientemente</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

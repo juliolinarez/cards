@@ -18,6 +18,13 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Hotwire test routes
+  get "hotwire-test", to: "hotwire_test#index", as: :hotwire_test
+  post "hotwire-test/button-one", to: "hotwire_test#button_one", as: :hotwire_test_button_one
+  post "hotwire-test/button-two", to: "hotwire_test#button_two", as: :hotwire_test_button_two
+  post "hotwire-test/button-three", to: "hotwire_test#button_three", as: :hotwire_test_button_three
+  post "hotwire-test/reset", to: "hotwire_test#reset_counter", as: :hotwire_test_reset
+
   # Defines the root path route ("/")
   root "home#index"
 end
