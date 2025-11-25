@@ -1,13 +1,6 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
-
-# Avoid unused variables
 Lint/UnusedBlockArgument:
   Enabled: true
 
@@ -144,3 +137,5 @@ Layout/ArgumentAlignment:
 Layout/MultilineMethodCallIndentation:
   Enabled: true
   EnforcedStyle: indented_relative_to_receiver
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: no_space
