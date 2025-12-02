@@ -4,7 +4,7 @@
 #
 
 app = 'proxyfield-app'
-primary_region = 'scl'
+primary_region = 'gru'
 org = 'cards'
 
 [build]
