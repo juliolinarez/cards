@@ -17,6 +17,9 @@ Lint/UnusedMethodArgument:
 Metrics/MethodLength:
   Enabled: true
   Max: 20
+  Exclude:
+  - 'db/migrate/*'
+  - 'db/schema.rb'
 
 # Force 2-space indentation
 Layout/IndentationWidth:
@@ -68,6 +71,8 @@ Metrics/BlockLength:
     - 'spec/**/*'
     - 'config/routes.rb'
     - 'config/environments/*'
+    - 'db/migrate/*'
+    - 'db/schema.rb'
 
 # Documentation requirements
 Style/Documentation:

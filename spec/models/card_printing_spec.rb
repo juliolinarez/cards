@@ -9,8 +9,6 @@ RSpec.describe CardPrinting, type: :model do
   it { should validate_presence_of(:scryfall_id) }
   it { should validate_presence_of(:name) }
 
-  # Attachment presence cannot be tested with shoulda-matchers by default, but you could add custom checks for attached images as needed.
-
   describe 'scopes' do
     # Example: by_name returns printing by substring matching
     let!(:printing1) { create(:card_printing, name: 'Fireball') }
