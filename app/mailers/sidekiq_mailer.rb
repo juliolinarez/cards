@@ -1,5 +1,5 @@
 class SidekiqMailer < ApplicationMailer
-  default from: "no-reply@proxyfield.com"
+  default from: "juliolinarezescobar@gmail.com"
 
   def health_check_notification(email)
     @timestamp = Time.current
